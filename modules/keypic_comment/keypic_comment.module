@@ -80,3 +80,12 @@ function keypic_comment_insert($comment) {
   $record->point = $keypic_spam_point;
   drupal_write_record('keypic_comment', $record);
 }
+
+/**
+ * Implements hook_comment_delete().
+ */
+function keypic_comment_comment_delete($comment) {
+  db_delete('keypic_comment')
+    ->condition('cid', $comment->cid)
+    ->execute();
+}
