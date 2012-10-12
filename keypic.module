@@ -1,9 +1,8 @@
 <?php
 /**
+ * @file keypic.module
  *
- * @param type $path
- * @param type $arg
- * @return type
+ * Integrate KeyPic web service to prevent spam content for Drupal sites.
  */
 
 /**
