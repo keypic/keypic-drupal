@@ -80,8 +80,8 @@ function keypic_comment_insert($comment) {
   $record = new stdClass();
   $record->entity_type = 'comment';
   $record->entity_id = $comment->cid;
-  $record->token = $keypic_spam_point;
-  $record->point = $keypic_spam_token;
+  $record->point = $keypic_spam_point;
+  $record->token = $keypic_spam_token;
   drupal_write_record('keypic_comment', $record);
 }
 
