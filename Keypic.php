@@ -6,7 +6,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 /*  Copyright 2010-2012  Keypic LLC (email : info@keypic.com)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -18,7 +18,7 @@ error_reporting(E_ALL & ~E_NOTICE);
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-	
+
 	Works only with PHP >= 5.3.0
 */
 
@@ -283,7 +283,7 @@ class Socket
 			}
 
 			fclose($fs);
-			
+
 		}
 	}
 

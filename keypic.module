@@ -20,6 +20,14 @@ function keypic_permission() {
  * Implements hook_menu().
  */
 function keypic_menu() {
+  $items['keypic/report-spam/%'] = array(
+    'title' => 'Report spam to KeyPic',
+    'access arguments' => array('administer comments'),
+    'file' => 'keypic.pages.inc',
+    'page callback' => 'keypic_report_spam_page_callback',
+    'page arguments' => array(2)
+  );
+
   $items['admin/config/people/captcha/keypic'] = array(
     'title' => 'KeyPic',
     'description' => 'Administer the KeyPic web service.',
