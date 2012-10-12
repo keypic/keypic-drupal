@@ -1,0 +1,71 @@
+<?php
+/**
+ * @file keypic_user.module
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Make sure the user register form is always protected.
+ */
+function keypic_user_form_user_register_form_alter(&$form, $form_state) {
+  // Captcha is already included
+  if (isset($form['captcha'])) return;
+
+  $form['captcha'] = array(
+    '#type' => 'captcha',
+    '#captcha_type' => 'keypic/KeyPic',
+    '#weight' => 100,
+  );
+}
+
+/**
+ * Implements keypic.module\hook_keypic_validate().
+ */
+function keypic_user_keypic_validate($response = 0, $token = '', $form = array(), $form_state = array()) {
+  static $keypic_spam_point = 0;
+  static $keypic_spam_token = '';
+
+  // Detect comment form
+  if (!empty($form_state)) {
+    $is_user = $form_state['build_info']['form_id'] === 'user_register_form';
+    if (!$is_user) return;
+  }
+
+  if (!empty($response)) {
+    $keypic_spam_point = $response;
+  }
+
+  if (!empty($token)) {
+    $keypic_spam_token = $token;
+  }
+
+  return array($keypic_spam_point, $keypic_spam_token);
+}
+
+/**
+ * Implemens hook_user_insert().
+ */
+function keypic_user_user_insert($account) {
+  list($keypic_spam_point, $keypic_spam_token) = keypic_user_keypic_validate();
+
+  if (!$keypic_spam_point) return;
+  if (!$keypic_spam_token) return;
+
+  $record = new stdClass();
+  $record->entity_type = 'user';
+  $record->entity_id = $account->uid;
+  $record->point = $keypic_spam_point;
+  $record->token = $keypic_spam_token;
+  drupal_write_record('keypic_comment', $record);
+}
+
+/**
+ * Implements hook_user_delete().
+ */
+function keypic_user_user_delete($account) {
+  db_delete('keypic_comment')
+    ->condition('entity_type', 'user')
+    ->condition('entity_id', $account->uid)
+    ->execute();
+}
