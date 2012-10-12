@@ -1,0 +1,154 @@
+<?php
+/**
+ *
+ * @param type $path
+ * @param type $arg
+ * @return type
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function keypic_permission() {
+  return array(
+    'administer keypic' => array(
+      'title' => t('KeyPic Administration'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function keypic_menu() {
+  $items['admin/config/people/captcha/keypic'] = array(
+    'title' => 'KeyPic',
+    'description' => 'Administer the KeyPic web service.',
+    'access arguments' => array('administer keypic'),
+    'file' => 'keypic.admin.inc',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('keypic_admin_settings_form'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implements captcha.module\hook_captcha().
+ */
+function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
+  switch ($op) {
+    case 'list':
+      return array('KeyPic');
+
+    case 'generate':
+      return keypic_captcha_generate($captcha_sid);
+  }
+}
+
+/**
+ * Generate keypic captcha.
+ */
+function keypic_captcha_generate($captcha_sid) {
+  module_load_include('php', 'keypic', 'Keypic');
+
+  $result['solution'] = Keypic::getToken('');
+  $result['form']['keypic_image'] = array(
+    '#type' => 'markup',
+    '#markup' => Keypic::getImage(),
+    '#weight' => -2,
+  );
+  $result['captcha_validate'] = 'keypic_captcha_challenge_validate';
+  return $result;
+}
+
+/**
+ * Captcha validating callback.
+ */
+function keypic_captcha_challenge_validate($solution, $response = '', $form, $form_state) {
+  switch ($form_state['build_info']['form_id']) {
+    case 'contact_personal_form':
+    case 'contact_site_form':
+      $callback = 'keypick_build_params_contact';
+      break;
+    case 'user_register_form':
+      $callback = 'keypick_build_params_user_register';
+      break;
+    case 'user_pass':
+      $callback = 'keypick_build_params_user_pass';
+      break;
+    case 'user_login':
+    case 'user_login_block':
+      $callback = 'keypick_build_params_user_login';
+      break;
+    default:
+      $callback = 'keypick_build_params_default';
+  }
+
+  $token = $solution;
+  list($email, $name, $mesasge) = $callback($form, $form_state);
+
+  module_load_include('php', 'keypic', 'Keypic');
+  $response = Keypic::isSpam($token, $email, $name, $mesasge);
+  if (is_numeric($response)) {
+    return TRUE;
+  }
+  throw new Exception($response);
+}
+
+/**
+ * Param builder for contact form.
+ */
+function keypick_build_params_contact($form, $form_state) {
+  $name = $form_state['value']['name'];
+  $mail = $form_state['value']['mail'];
+  $message = $form_state['value']['message'];
+  return array($mail, $name, $message);
+}
+
+/**
+ * Param builder for user register form.
+ */
+function keypick_build_params_user_register($form, $form_state) {
+  $email = $form_state['values']['mail'];
+  $name  = $form_state['values']['name'];
+  $msg   = '';
+  return array($email, $name, $mesasge);
+}
+
+/**
+ * Param builder for user password form.
+ */
+function keypick_build_params_user_pass($form, $form_state) {
+  $value = $form_state['values']['name'];
+  $email = valid_email_address($value) ? $value : '';
+  $name  = empty($email) ? $value : '';
+  $mesasge = '';
+  return array($email, $name, $mesasge);
+}
+
+/**
+ * Default param builder.
+ */
+function keypick_build_params_default($form, $form_state) {
+  global $user;
+  $email = $user->mail;
+  $name = $user->name;
+  $mesasge = '';
+  foreach ($form_state['values'] as $key => $val) {
+    $ignore = $key === 'submit';
+    $ignore = $ignore || ($key === 'form_build_id');
+    $ignore = $ignore || ($key === 'form_id');
+    $ignore = $ignore || ($key === 'op');
+    if ($ignore) continue;
+
+    if (is_string($val)) {
+      $mesasge .= $val . "\n";
+    }
+    else {
+      $mesasge .= print_r($val, TRUE) . "\n";
+    }
+  }
+
+  return array($email, $name, $mesasge);
+}
