@@ -36,7 +36,7 @@ function keypic_comment_schema() {
         'description' => 'Spam Point from KeyPic',
       ),
     ),
-    'primary key' => array('cid'),
+    'primary key' => array('entity_type', 'entity_id'),
   );
 
   return $schema;

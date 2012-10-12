@@ -27,29 +27,21 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
 function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
   $comment_ids = array_keys($form['comments']['#options']);
 
-  foreach (keypic_comment_load_points($comment_ids) as $cid => $point) {
+  foreach (keypic_load_entities_points('comment', $comment_ids) as $info) {
+    $cid = $info->entity_id;
     $alter = TRUE;
-    $form['comments']['#options'][$cid]['keypic']  = $point . '%';
-    $form['comments']['#options'][$cid]['keypic'] .= ' (' .keypic_get_status_info($point) . ')';
+    $form['comments']['#options'][$cid]['keypic'] = theme('item_list', array(
+      'items' => array(
+        t('!number% of spam', array('!number' => $info->point))
+          . ' (' . keypic_get_status_info($info->point) . ')',
+        l(t('Report spam'), "keypic/report-spam/{$info->token}")
+      ))
+    );
   }
 
   if (!empty($alter)) {
-    $form['comments']['#header']['keypic']['data'] = t('Percent of span - by KeyPic');
+    $form['comments']['#header']['keypic']['data'] = t('KeyPic');
   }
-}
-
-/**
- * Load Keypic spam points of comments by comment IDs.
- */
-function keypic_comment_load_points($comment_ids = array()) {
-  if (empty($comment_ids)) {
-    return array();
-  }
-
-  $select = db_select('keypic_comment', 'kpc');
-  $select->condition('kpc.cid', $comment_ids);
-  $select->fields('kpc', array('cid', 'point'));
-  return $select->execute()->fetchAllKeyed();
 }
 
 /**

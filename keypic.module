@@ -188,16 +188,31 @@ function keypick_build_params_default($form, $form_state) {
 }
 
 /**
+ * Load Keypic spam points of comments by comment IDs.
+ */
+function keypic_load_entities_points($entity_type, $entity_ids = array()) {
+  if (empty($entity_ids)) {
+    return array();
+  }
+
+  $select = db_select('keypic_comment', 'kpc');
+  $select->condition('kpc.entity_type', 'comment');
+  $select->condition('kpc.entity_id', $entity_ids);
+  $select->fields('kpc', array('entity_id', 'token', 'point'));
+  return $select->execute()->fetchAll();
+}
+
+/**
  * Get status by point.
  */
 function keypic_get_status_info($point) {
   if ($point < 40) {
-    return t("Is not spam");
+    return t("is not spam");
   }
 
   if ($point < 70) {
-    return t("Maybe spam");
+    return t("maybe spam");
   }
 
-  return t('Is spam');
+  return t('is spam');
 }
