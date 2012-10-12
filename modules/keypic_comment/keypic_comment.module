@@ -22,6 +22,35 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
+  $comment_ids = array_keys($form['comments']['#options']);
+  foreach (keypic_comment_load_points($comment_ids) as $cid => $point) {
+    $alter = TRUE;
+    $form['comments']['#options'][$cid]['keypic'] = $point . '%';
+  }
+
+  if (!empty($alter)) {
+    $form['comments']['#header']['keypic']['data'] = t('Percent of span - by KeyPic');
+  }
+}
+
+/**
+ * Load Keypic spam points of comments by comment IDs.
+ */
+function keypic_comment_load_points($comment_ids = array()) {
+  if (empty($comment_ids)) {
+    return array();
+  }
+
+  $select = db_select('keypic_comment', 'kpc');
+  $select->condition('kpc.cid', $comment_ids);
+  $select->fields('kpc', array('cid', 'point'));
+  return $select->execute()->fetchAllKeyed();
+}
+
+/**
  * Implements hook_keypic_validate().
  */
 function keypic_comment_keypic_validate($response = 0, $form = array(), $form_state = array()) {
