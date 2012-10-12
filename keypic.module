@@ -136,6 +136,13 @@ function keypick_build_params_user_pass($form, $form_state) {
 }
 
 /**
+ * Param builder for user login form.
+ */
+function keypick_build_params_user_login($form, $form_state) {
+  return array($email = '', $form_state['values']['name'], $mesasge = '');
+}
+
+/**
  * Param builder for comment form.
  */
 function keypick_build_params_comment($form, $form_state) {
