@@ -26,9 +26,11 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
  */
 function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
   $comment_ids = array_keys($form['comments']['#options']);
+
   foreach (keypic_comment_load_points($comment_ids) as $cid => $point) {
     $alter = TRUE;
-    $form['comments']['#options'][$cid]['keypic'] = $point . '%';
+    $form['comments']['#options'][$cid]['keypic']  = $point . '%';
+    $form['comments']['#options'][$cid]['keypic'] .= ' (' .keypic_get_status_info($point) . ')';
   }
 
   if (!empty($alter)) {

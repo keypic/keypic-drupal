@@ -186,3 +186,18 @@ function keypick_build_params_default($form, $form_state) {
 
   return array($email, $name, $mesasge);
 }
+
+/**
+ * Get status by point.
+ */
+function keypic_get_status_info($point) {
+  if ($point < 40) {
+    return t("Is not spam");
+  }
+
+  if ($point < 70) {
+    return t("Maybe spam");
+  }
+
+  return t('Is spam');
+}
