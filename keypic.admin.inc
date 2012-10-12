@@ -26,7 +26,11 @@ function keypic_admin_settings_form($form, &$form_state) {
     '#title' => t('Minimum spam point'),
     '#default_value' => variable_get('keypic_spam_point', 70),
     '#element_validate' => array('keypic_validate_spam_point_element'),
-    '#description' => t('Keypic response point which great this value will be considered as spam. Valid value is from 0 to 100'),
+    '#description' => t(
+        'Keypic response point which great this value will be considered as spam.'
+          . ' Valid value is from 0 to 100.'
+          . ' 0…39: Not spam. 40…69: Maybe spam. 70…100: Is spam.'
+      ),
   );
 
   return system_settings_form($form);
