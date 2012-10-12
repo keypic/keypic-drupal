@@ -46,7 +46,7 @@ function keypic_user_keypic_validate($response = 0, $token = '', $form = array()
 /**
  * Implemens hook_user_insert().
  */
-function keypic_user_user_insert($account) {
+function keypic_user_user_insert(&$edit, $account, $category) {
   list($keypic_spam_point, $keypic_spam_token) = keypic_user_keypic_validate();
 
   if (!$keypic_spam_point) return;
@@ -68,4 +68,28 @@ function keypic_user_user_delete($account) {
     ->condition('entity_type', 'user')
     ->condition('entity_id', $account->uid)
     ->execute();
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alter to user admin form.
+ */
+function keypic_user_form_user_admin_account_alter(&$form, $form_state) {
+  $account_ids = array_keys($form['accounts']['#options']);
+  foreach (keypic_load_entities_points('user', $account_ids) as $info) {
+    $cid = $info->entity_id;
+    $alter = TRUE;
+    $form['accounts']['#options'][$cid]['keypic'] = theme('item_list', array(
+      'items' => array(
+        t('!number% of spam', array('!number' => $info->point))
+          . ' (' . keypic_get_status_info($info->point) . ')',
+        l(t('Report spam'), "keypic/report-spam/{$info->token}")
+      ))
+    );
+  }
+
+  if (!empty($alter)) {
+    $form['accounts']['#header']['keypic']['data'] = t('KeyPic');
+  }
 }
