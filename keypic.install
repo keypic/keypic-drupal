@@ -1,0 +1,11 @@
+<?php
+/**
+ * @file keypic.install
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function keypic_uninstall() {
+  variable_del('keypic_spam_point');
+}
