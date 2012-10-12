@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file keypic_comment.module
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function keypic_comment_form_alter(&$form, $form_state, $form_id) {
+  // Captcha is already included
+  if (isset($form['captcha'])) return;
+
+  // Detect comment form
+  $is_comment = strpos($form['#form-id'], 'comment-form') === 0;
+  if (!$is_comment) return;
+
+  $form['keypic_comment'] = array(
+    '#type' => 'captcha',
+    '#captcha_type' => 'keypic/KeyPic',
+    '#weight' => 100,
+  );
+}
+
+/**
+ * Implements hook_keypic_validate().
+ */
+function keypic_comment_keypic_validate($response = 0, $form = array(), $form_state = array()) {
+  static $keypic_spam_point = 0;
+
+  // Detect comment form
+  if (!empty($form_state)) {
+    $is_comment = $form_state['build_info']['base_form_id'] === 'comment_form';
+    if (!$is_comment) return;
+  }
+
+  if (!empty($response)) {
+    $keypic_spam_point = $response;
+  }
+
+  return $keypic_spam_point;
+}
+
+/**
+ * Implemens hook_comment_insert().
+ */
+function keypic_comment_insert($comment) {
+  if (!$keypic_spam_point = keypic_comment_keypic_validate()) return;
+
+  $record = new stdClass();
+  $record->cid = $comment->cid;
+  $record->point = $keypic_spam_point;
+  drupal_write_record('keypic_comment', $record);
+}

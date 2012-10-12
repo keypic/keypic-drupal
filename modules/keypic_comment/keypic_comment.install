@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file keypic_comment.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function keypic_comment_schema() {
+  $schema['keypic_comment'] = array(
+    'description' => 'Table to save keypic spam point of comments.',
+    'fields' => array(
+      'cid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'Comment ID',
+      ),
+      'point' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Spam Point from KeyPic',
+      ),
+    ),
+    'primary key' => array('cid'),
+  );
+
+  return $schema;
+}

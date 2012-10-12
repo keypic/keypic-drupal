@@ -1,0 +1,10 @@
+name = KeyPic Comment
+version = 7.x-1.0-dev
+description = Integrate KeyPic to Drupal comment.
+
+package = Spam control
+
+dependencies[] = comment
+dependencies[] = keypic
+
+core = 7.x
