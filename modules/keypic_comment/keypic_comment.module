@@ -61,6 +61,10 @@ function keypic_comment_keypic_validate($response = 0, $token = '', $form = arra
     $keypic_spam_point = $response;
   }
 
+  if (!empty($token)) {
+    $keypic_spam_token = $token;
+  }
+
   return array($keypic_spam_point, $keypic_spam_token);
 }
 
@@ -68,13 +72,16 @@ function keypic_comment_keypic_validate($response = 0, $token = '', $form = arra
  * Implemens hook_comment_insert().
  */
 function keypic_comment_insert($comment) {
-  if (!$keypic_spam_point = keypic_comment_keypic_validate()) return;
+  list($keypic_spam_point, $keypic_spam_token) = keypic_comment_keypic_validate();
+
+  if (!$keypic_spam_point) return;
+  if (!$keypic_spam_token) return;
 
   $record = new stdClass();
   $record->entity_type = 'comment';
   $record->entity_id = $comment->cid;
   $record->token = $keypic_spam_point;
-  $record->point = $keypic_spam_point;
+  $record->point = $keypic_spam_token;
   drupal_write_record('keypic_comment', $record);
 }
 
