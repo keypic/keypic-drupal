@@ -95,7 +95,7 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
   $response = Keypic::isSpam($token, $email, $name, $mesasge);
   if (is_numeric($response)) {
     // Allow other module to invoke to this event
-    module_invoke_all('keypic_validate', $response, $form, $form_state);
+    module_invoke_all('keypic_validate', $response, $token, $form, $form_state);
 
     $conf_min = variable_get('keypic_spam_point', 70);
     return $response < $conf_min;

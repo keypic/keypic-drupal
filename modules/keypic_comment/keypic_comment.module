@@ -55,8 +55,9 @@ function keypic_comment_load_points($comment_ids = array()) {
 /**
  * Implements hook_keypic_validate().
  */
-function keypic_comment_keypic_validate($response = 0, $form = array(), $form_state = array()) {
+function keypic_comment_keypic_validate($response = 0, $token = '', $form = array(), $form_state = array()) {
   static $keypic_spam_point = 0;
+  static $keypic_spam_token = '';
 
   // Detect comment form
   if (!empty($form_state)) {
@@ -68,7 +69,7 @@ function keypic_comment_keypic_validate($response = 0, $form = array(), $form_st
     $keypic_spam_point = $response;
   }
 
-  return $keypic_spam_point;
+  return array($keypic_spam_point, $keypic_spam_token);
 }
 
 /**
@@ -78,7 +79,9 @@ function keypic_comment_insert($comment) {
   if (!$keypic_spam_point = keypic_comment_keypic_validate()) return;
 
   $record = new stdClass();
-  $record->cid = $comment->cid;
+  $record->entity_type = 'comment';
+  $record->entity_id = $comment->cid;
+  $record->token = $keypic_spam_point;
   $record->point = $keypic_spam_point;
   drupal_write_record('keypic_comment', $record);
 }
@@ -88,6 +91,7 @@ function keypic_comment_insert($comment) {
  */
 function keypic_comment_comment_delete($comment) {
   db_delete('keypic_comment')
-    ->condition('cid', $comment->cid)
+    ->condition('entity_type', 'comment')
+    ->condition('entity_id', $comment->cid)
     ->execute();
 }
