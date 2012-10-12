@@ -5,6 +5,8 @@
 
 /**
  * Implements hook_form_alter().
+ *
+ * Make sure the comment form is always protected.
  */
 function keypic_comment_form_alter(&$form, $form_state, $form_id) {
   // Captcha is already included
@@ -14,7 +16,7 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
   $is_comment = strpos($form['#form-id'], 'comment-form') === 0;
   if (!$is_comment) return;
 
-  $form['keypic_comment'] = array(
+  $form['captcha'] = array(
     '#type' => 'captcha',
     '#captcha_type' => 'keypic/KeyPic',
     '#weight' => 100,
@@ -45,7 +47,7 @@ function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
 }
 
 /**
- * Implements hook_keypic_validate().
+ * Implements keypic.module\hook_keypic_validate().
  */
 function keypic_comment_keypic_validate($response = 0, $token = '', $form = array(), $form_state = array()) {
   static $keypic_spam_point = 0;
@@ -71,7 +73,7 @@ function keypic_comment_keypic_validate($response = 0, $token = '', $form = arra
 /**
  * Implemens hook_comment_insert().
  */
-function keypic_comment_insert($comment) {
+function keypic_comment_comment_insert($comment) {
   list($keypic_spam_point, $keypic_spam_token) = keypic_comment_keypic_validate();
 
   if (!$keypic_spam_point) return;
