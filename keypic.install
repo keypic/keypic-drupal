@@ -43,9 +43,11 @@ function keypic_schema() {
         'description' => 'Spam Point from KeyPic',
       ),
     ),
+    'indexes' => array(
+      'token' => array('token'),
+    ),
     'primary key' => array('entity_type', 'entity_id'),
   );
 
   return $schema;
 }
-
