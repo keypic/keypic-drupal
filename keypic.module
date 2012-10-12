@@ -85,6 +85,10 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
       $callback = 'keypick_build_params_default';
   }
 
+  if ($form_state['build_info']['base_form_id']) {
+    $callback = 'keypick_build_params_comment';
+  }
+
   $token = $solution;
   list($email, $name, $mesasge) = $callback($form, $form_state);
 
@@ -128,6 +132,26 @@ function keypick_build_params_user_pass($form, $form_state) {
   $email = valid_email_address($value) ? $value : '';
   $name  = empty($email) ? $value : '';
   $mesasge = '';
+  return array($email, $name, $mesasge);
+}
+
+/**
+ * Param builder for comment form.
+ */
+function keypick_build_params_comment($form, $form_state) {
+  $value = &$form_state['values'];
+  $email = !empty($value['mail']) ? $value['mail'] : $GLOBALS['user']->mail;
+  $name  = $value['name'];
+  $mesasge = '';
+  if (!empty($value['comment_body'])) {
+    // Before: $value['comment_body'][LANGUAGE_NONE][0]…
+    $mesasge = reset($value['comment_body']);
+    // Before: $message[0]['value']
+    $mesasge = reset($mesasge);
+    // Before: $message['value']
+    $mesasge = reset($mesasge);
+  }
+
   return array($email, $name, $mesasge);
 }
 
