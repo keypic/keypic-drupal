@@ -30,6 +30,13 @@ function keypic_schema() {
         'not null' => TRUE,
         'description' => 'Entity ID',
       ),
+      'form_id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'KeyPic form ID',
+      ),
       'token' => array(
         'type' => 'varchar',
         'length' => 128,
