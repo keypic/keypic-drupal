@@ -83,13 +83,15 @@ function keypic_user_form_user_admin_account_alter(&$form, $form_state) {
   foreach (keypic_load_entities_points('user', $account_ids) as $info) {
     $cid = $info->entity_id;
     $alter = TRUE;
-    $form['accounts']['#options'][$cid]['keypic'] = theme('item_list', array(
-      'items' => array(
-        t('!number% of spam', array('!number' => $info->point))
-          . ' (' . keypic_get_status_info($info->point) . ')',
-        l(t('Report spam'), "keypic/report-spam/{$info->token}")
-      ))
-    );
+
+    $items = array();
+    $items['point']  = t('!number% of spam', array('!number' => $info->point));
+    $items['point'] .= ' (' . keypic_get_status_info($info->point) . ')';
+    if (!empty($info->form_id)) {
+      $items['report'] = l(t('Report spam'), "keypic/report-spam/{$info->form_id}/{$info->token}");
+    }
+
+    $form['accounts']['#options'][$cid]['keypic'] = theme('item_list', array('items' => $items));
   }
 
   if (!empty($alter)) {
