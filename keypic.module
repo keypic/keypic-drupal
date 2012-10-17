@@ -73,9 +73,18 @@ function keypic_captcha_generate($captcha_sid) {
 
   $result['solution'] = Keypic::getToken('');
 
+  $widget_format = variable_get('keypic_widget_format', 'image');
+  $widget_size = variable_get('keypic_widget_size', '');
+  if ($widget_format === 'image') {
+    $markup = Keypic::getImage($widget_size);
+  }
+  else {
+    $markup = Keypic::getiFrame($widget_size);
+  }
+
   $result['form']['keypic_image'] = array(
     '#type' => 'markup',
-    '#markup' => Keypic::getImage(),
+    '#markup' => $markup,
     '#weight' => -2,
   );
   $result['captcha_validate'] = 'keypic_captcha_challenge_validate';

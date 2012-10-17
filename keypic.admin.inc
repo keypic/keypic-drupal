@@ -39,6 +39,44 @@ function keypic_admin_settings_form($form, &$form_state) {
       ),
   );
 
+  $form['keypic_widget_format'] = array(
+    '#type' => 'radios',
+    '#title' => t('Widget format'),
+    '#options' => array(
+      'image' => t('Image'),
+      'iframe' => t('Iframe'),
+    ),
+    '#default_value' => variable_get('keypic_widget_format', 'image'),
+  );
+
+  $form['keypic_widget_size'] = array(
+    '#type' => 'select',
+    '#title' => t('Widget size'),
+    '#options' => array(
+      '' => t('Default'),
+      '300x250' => '300x250',
+      '250x250' => '250x250',
+      '240x400' => '240x400',
+      '180x150' => '180x150',
+      '300x100' => '300x100',
+      '720x300' => '720x300',
+      '392x72'  => '392x72',
+      '468x60'  => '468x60',
+      '234x60'  => '234x60',
+      '80x15'  => '80x15',
+      '88x31'  => '88x31',
+      '120x90'  => '120x90',
+      '120x60'  => '120x60',
+      '120x240'  => '120x240',
+      '125x125'  => '125x125',
+      '728x90'  => '728x90',
+      '120x600'  => '120x600',
+      '160x600'  => '160x600',
+      '300x600'  => '300x600',
+    ),
+    '#default_value' => variable_get('keypic_widget_size', ''),
+  );
+
   return system_settings_form($form);
 }
 
