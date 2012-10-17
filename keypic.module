@@ -65,6 +65,12 @@ function keypic_captcha_generate($captcha_sid) {
   $agent = implode(' | ', $agent);
   Keypic::setUserAgent("User-Agent: {$agent}");
 
+  // Keypic needs formID
+  $keypic_form_id = variable_get('keypic_form_id', '');
+  if ($keypic_form_id) {
+    Keypic::setFormID($keypic_form_id);
+  }
+
   $result['solution'] = Keypic::getToken('');
 
   $result['form']['keypic_image'] = array(
