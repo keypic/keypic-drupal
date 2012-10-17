@@ -59,7 +59,14 @@ function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
 function keypic_captcha_generate($captcha_sid) {
   module_load_include('php', 'keypic', 'Keypic');
 
+  // Keypic needs agent.
+  $agent[] = 'Drupal/7.x-1.x';
+  $agent[] = 'Keypic PHP5 Class, Version: ' . Keypic::getVersion();
+  $agent = implode(' | ', $agent);
+  Keypic::setUserAgent("User-Agent: {$agent}");
+
   $result['solution'] = Keypic::getToken('');
+
   $result['form']['keypic_image'] = array(
     '#type' => 'markup',
     '#markup' => Keypic::getImage(),
