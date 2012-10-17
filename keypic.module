@@ -20,7 +20,7 @@ function keypic_permission() {
  * Implements hook_menu().
  */
 function keypic_menu() {
-  $items['keypic/report-spam/%'] = array(
+  $items['keypic/report-spam/%/%'] = array(
     'title' => 'Report spam to KeyPic',
     'access arguments' => array('administer comments'),
     'file' => 'keypic.pages.inc',
@@ -229,7 +229,7 @@ function keypic_load_entities_points($entity_type, $entity_ids = array()) {
   $select = db_select('keypic_comment', 'kpc');
   $select->condition('kpc.entity_type', $entity_type);
   $select->condition('kpc.entity_id', $entity_ids);
-  $select->fields('kpc', array('entity_id', 'token', 'point'));
+  $select->fields('kpc', array('entity_id', 'token', 'form_id', 'point'));
   return $select->execute()->fetchAll();
 }
 
