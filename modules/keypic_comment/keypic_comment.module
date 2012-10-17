@@ -13,7 +13,8 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
   if (isset($form['captcha'])) return;
 
   // Detect comment form
-  $is_comment = strpos($form['#form-id'], 'comment-form') === 0;
+  $is_comment = isset($form['#form-id']);
+  $is_comment = $is_comment && strpos($form['#form-id'], 'comment-form') === 0;
   if (!$is_comment) return;
 
   $form['captcha'] = array(
