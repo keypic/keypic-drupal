@@ -84,6 +84,9 @@ function keypic_comment_comment_insert($comment) {
   $record->entity_id = $comment->cid;
   $record->point = $keypic_spam_point;
   $record->token = $keypic_spam_token;
+  if ($keypic_form_id = variable_get('keypic_form_id', '')) {
+    $record->form_id = $keypic_form_id;
+  }
   drupal_write_record('keypic_comment', $record);
 }
 
