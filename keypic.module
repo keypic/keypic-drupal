@@ -115,10 +115,20 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
   module_load_include('php', 'keypic', 'Keypic');
   $response = Keypic::isSpam($token, $email, $name, $mesasge);
   if (is_numeric($response)) {
+    // Check form ID.
+    if ($keypic_form_id = variable_get('keypic_form_id', '')) {
+      $status = Keypic::checkFormID($keypic_form_id);
+      if ($status['status'] !== 'response') {
+        throw new Exception($status['error']);
+      }
+    }
+
     // Allow other module to invoke to this event
     module_invoke_all('keypic_validate', $response, $token, $form, $form_state);
 
+    // Get configuration
     $conf_min = variable_get('keypic_spam_point', 70);
+
     return $response < $conf_min;
   }
   throw new Exception($response);
