@@ -21,6 +21,12 @@ function keypic_admin_settings_form($form, &$form_state) {
     '#captcha_admin_mode' => TRUE,
   );
 
+  $form['keypic_form_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Keypic Form ID'),
+    '#default_value' => variable_get('keypic_form_id', ''),
+  );
+
   $form['keypic_spam_point'] = array(
     '#type' => 'textfield',
     '#title' => t('Minimum spam point'),
