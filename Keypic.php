@@ -25,7 +25,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 class Keypic
 {
 	private static $Instance;
-	private static $version = '1.3';
+	private static $version = '1.4';
 	private static $UserAgent = 'User-Agent: Keypic PHP5 Class, Version: 1.3';
 	private static $host = 'ws.keypic.com';
 	private static $url = '/';
@@ -56,10 +56,10 @@ class Keypic
 		self::$version = $version;
 	}
 
-  public static function getVersion()
-  {
-    return self::$version;
-  }
+	public static function getVersion()
+	{
+		return self::$version;
+	}
 
 	public static function setUserAgent($UserAgent)
 	{
