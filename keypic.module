@@ -226,7 +226,7 @@ function keypic_load_entities_points($entity_type, $entity_ids = array()) {
     return array();
   }
 
-  $select = db_select('keypic_comment', 'kpc');
+  $select = db_select('keypic_log', 'kpc');
   $select->condition('kpc.entity_type', $entity_type);
   $select->condition('kpc.entity_id', $entity_ids);
   $select->fields('kpc', array('entity_id', 'token', 'form_id', 'point'));
