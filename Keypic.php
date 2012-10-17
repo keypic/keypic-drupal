@@ -56,6 +56,11 @@ class Keypic
 		self::$version = $version;
 	}
 
+  public static function getVersion()
+  {
+    return self::$version;
+  }
+
 	public static function setUserAgent($UserAgent)
 	{
 		self::$UserAgent = $UserAgent;
