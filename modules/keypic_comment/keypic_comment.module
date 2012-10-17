@@ -89,14 +89,14 @@ function keypic_comment_comment_insert($comment) {
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }
-  drupal_write_record('keypic_comment', $record);
+  drupal_write_record('keypic_log', $record);
 }
 
 /**
  * Implements hook_comment_delete().
  */
 function keypic_comment_comment_delete($comment) {
-  db_delete('keypic_comment')
+  db_delete('keypic_log')
     ->condition('entity_type', 'comment')
     ->condition('entity_id', $comment->cid)
     ->execute();

@@ -15,7 +15,7 @@ function keypic_uninstall() {
  * Implements hook_schema().
  */
 function keypic_schema() {
-  $schema['keypic_comment'] = array(
+  $schema['keypic_log'] = array(
     'description' => 'Table to save keypic spam point of comments.',
     'fields' => array(
       'entity_type' => array(

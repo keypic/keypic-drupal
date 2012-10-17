@@ -60,14 +60,14 @@ function keypic_user_user_insert(&$edit, $account, $category) {
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }
-  drupal_write_record('keypic_comment', $record);
+  drupal_write_record('keypic_log', $record);
 }
 
 /**
  * Implements hook_user_delete().
  */
 function keypic_user_user_delete($account) {
-  db_delete('keypic_comment')
+  db_delete('keypic_log')
     ->condition('entity_type', 'user')
     ->condition('entity_id', $account->uid)
     ->execute();
