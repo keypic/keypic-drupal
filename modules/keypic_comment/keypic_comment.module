@@ -44,6 +44,15 @@ function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
     $form['comments']['#options'][$cid]['keypic'] = theme('item_list', array('items' => $items));
   }
 
+  /**
+   * Avoid php warnings.
+   */
+  foreach ($comment_ids as $comment_id) {
+    if (!isset($form['comments']['#options'][$cid]['keypic'])) {
+      $form['comments']['#options'][$cid]['keypic'] = '';
+    }
+  }
+
   if (!empty($alter)) {
     $form['comments']['#header']['keypic']['data'] = t('KeyPic');
   }
