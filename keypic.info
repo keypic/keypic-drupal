@@ -1,5 +1,5 @@
 name = Keypic
-version = 7.x-1.0-dev
+version = 7.x-1.0-beta1
 description = KeyPic captcha challenge
 package = Spam control
 core = 7.x
