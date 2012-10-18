@@ -9,7 +9,7 @@
  *  Page callback for KeyPic spam reporting page.
  */
 function keypic_report_spam_page_callback($form_id, $token) {
-  $select = db_select('keypic_comment', 'kpc');
+  $select = db_select('keypic_log', 'kpc');
   $select->condition('kpc.token', $token);
   $select->addExpression('COUNT(*)', 'counter');
   if ($log = $select->execute()->fetchObject()) {
