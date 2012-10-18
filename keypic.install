@@ -9,8 +9,7 @@
 function keypic_uninstall() {
   variable_del('keypic_form_id');
   variable_del('keypic_spam_point');
-  variable_del('keypic_widget_format');
-  variable_del('keypic_widget_size');
+  variable_del('keypic_widget');
   drupal_uninstall_schema('keypic');
 }
 
