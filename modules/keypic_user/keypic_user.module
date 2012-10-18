@@ -29,6 +29,7 @@ function keypic_user_keypic_validate($response = 0, $token = '', $form = array()
   // Detect comment form
   if (!empty($form_state)) {
     $is_user = $form_state['build_info']['form_id'] === 'user_register_form';
+    $is_user = $is_user || ($form_state['input']['form_id'] === 'user_register_form');
     if (!$is_user) return;
   }
 
