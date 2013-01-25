@@ -26,7 +26,7 @@ class Keypic
 {
 	private static $Instance;
 	private static $version = '1.4';
-	private static $UserAgent = 'User-Agent: Keypic PHP5 Class, Version: 1.3';
+	private static $UserAgent = 'User-Agent: Keypic PHP5 Class, Version: 1.4';
 	private static $host = 'ws.keypic.com';
 	private static $url = '/';
 	private static $port = 80;
