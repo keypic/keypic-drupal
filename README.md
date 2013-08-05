@@ -30,5 +30,3 @@ Admin can config which role can skip captcha. We do not need any back door.
 About:
 > After completing the plugin you have to provide it to keypic managers to
 > try it on some preinstalled platform installation.
-
-My dev site is http://keypic.dev.drupal.vc/
