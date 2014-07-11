@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic_comment.module
  */
@@ -10,12 +11,15 @@
  */
 function keypic_comment_form_alter(&$form, $form_state, $form_id) {
   // Captcha is already included
-  if (isset($form['captcha'])) return;
+  if (isset($form['captcha'])) {
+    return;
+  }
 
   // Detect comment form
-  $is_comment = isset($form['#form-id']);
-  $is_comment = $is_comment && strpos($form['#form-id'], 'comment-form') === 0;
-  if (!$is_comment) return;
+  $is_comment = isset($form['#form-id']) && strpos($form['#form-id'], 'comment-form') === 0;
+  if (!$is_comment) {
+    return;
+  }
 
   $form['captcha'] = array(
     '#type' => 'captcha',
@@ -35,7 +39,7 @@ function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
     $alter = TRUE;
 
     $items = array();
-    $items['point']  = t('!number% of spam', array('!number' => $info->point));
+    $items['point'] = t('!number% of spam', array('!number' => $info->point));
     $items['point'] .= ' (' . keypic_get_status_info($info->point) . ')';
     if (!empty($info->form_id)) {
       $items['report'] = l(t('Report spam'), "keypic/report-spam/{$info->form_id}/{$info->token}");
@@ -68,7 +72,9 @@ function keypic_comment_keypic_validate($response = 0, $token = '', $form = arra
   // Detect comment form
   if (!empty($form_state)) {
     $is_comment = $form_state['build_info']['base_form_id'] === 'comment_form';
-    if (!$is_comment) return;
+    if (!$is_comment) {
+      return;
+    }
   }
 
   if (!empty($response)) {
@@ -88,18 +94,36 @@ function keypic_comment_keypic_validate($response = 0, $token = '', $form = arra
 function keypic_comment_comment_insert($comment) {
   list($keypic_spam_point, $keypic_spam_token) = keypic_comment_keypic_validate();
 
-  if (!$keypic_spam_point) return;
-  if (!$keypic_spam_token) return;
+  if (!$keypic_spam_point || !$keypic_spam_token) {
+    return;
+  }
 
   $record = new stdClass();
   $record->entity_type = 'comment';
   $record->entity_id = $comment->cid;
   $record->point = $keypic_spam_point;
   $record->token = $keypic_spam_token;
+  $record->timestamp = time();
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }
   drupal_write_record('keypic_log', $record);
+}
+
+/**
+ * Implements hook_comment_view_alter()
+ */
+function keypic_comment_comment_view_alter(&$build) {
+  if (user_access('report keypic')) {
+    if ($logs = keypic_load_entities_points('comment', array($build['#comment']->cid))) {
+      $log = reset($logs);
+
+      $build['links']['comment']['#links']['keypic_comment_report'] = array(
+        'title' => t('Report spam !number%', array('!number' => $log->point)),
+        'href' => "keypic/report-spam/{$log->form_id}/{$log->token}",
+      );
+    }
+  }
 }
 
 /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic_user.module
  */
@@ -10,7 +11,9 @@
  */
 function keypic_user_form_user_register_form_alter(&$form, $form_state) {
   // Captcha is already included
-  if (isset($form['captcha'])) return;
+  if (isset($form['captcha'])) {
+    return;
+  }
 
   $form['captcha'] = array(
     '#type' => 'captcha',
@@ -30,7 +33,9 @@ function keypic_user_keypic_validate($response = 0, $token = '', $form = array()
   if (!empty($form_state)) {
     $is_user = $form_state['build_info']['form_id'] === 'user_register_form';
     $is_user = $is_user || ($form_state['input']['form_id'] === 'user_register_form');
-    if (!$is_user) return;
+    if (!$is_user) {
+      return;
+    }
   }
 
   if (!empty($response)) {
@@ -50,14 +55,16 @@ function keypic_user_keypic_validate($response = 0, $token = '', $form = array()
 function keypic_user_user_insert(&$edit, $account, $category) {
   list($keypic_spam_point, $keypic_spam_token) = keypic_user_keypic_validate();
 
-  if (!$keypic_spam_point) return;
-  if (!$keypic_spam_token) return;
+  if (!$keypic_spam_point || !$keypic_spam_token) {
+    return;
+  }
 
   $record = new stdClass();
   $record->entity_type = 'user';
   $record->entity_id = $account->uid;
   $record->point = $keypic_spam_point;
   $record->token = $keypic_spam_token;
+  $record->timestamp = time();
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }
@@ -86,7 +93,7 @@ function keypic_user_form_user_admin_account_alter(&$form, $form_state) {
     $alter = TRUE;
 
     $items = array();
-    $items['point']  = t('!number% of spam', array('!number' => $info->point));
+    $items['point'] = t('!number% of spam', array('!number' => $info->point));
     $items['point'] .= ' (' . keypic_get_status_info($info->point) . ')';
     if (!empty($info->form_id)) {
       $items['report'] = l(t('Report spam'), "keypic/report-spam/{$info->form_id}/{$info->token}");

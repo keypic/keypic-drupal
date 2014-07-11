@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic.pages.inc
  *
@@ -26,5 +27,6 @@ function keypic_report_spam_page_callback($form_id, $token) {
         break;
     }
   }
+  
   return drupal_not_found();
 }
