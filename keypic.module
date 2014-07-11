@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic.module
  *
@@ -10,6 +11,9 @@
  */
 function keypic_permission() {
   return array(
+    'report keypic' => array(
+      'title' => t('Report spam'),
+    ),
     'administer keypic' => array(
       'title' => t('KeyPic Administration'),
     ),
@@ -22,7 +26,7 @@ function keypic_permission() {
 function keypic_menu() {
   $items['keypic/report-spam/%/%'] = array(
     'title' => 'Report spam to KeyPic',
-    'access arguments' => array('administer comments'),
+    'access callback' => 'keypic_access_report',
     'file' => 'keypic.pages.inc',
     'page callback' => 'keypic_report_spam_page_callback',
     'page arguments' => array(2)
@@ -51,6 +55,15 @@ function keypic_menu() {
 }
 
 /**
+ * Check access to keypic's spam reporting route.
+ *
+ * @return boolean
+ */
+function keypic_access_report() {
+  return user_access('report keypic') || user_access('administer comments');
+}
+
+/**
  * Implements captcha.module\hook_captcha().
  */
 function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
@@ -66,6 +79,7 @@ function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
           $form_id = $item['args'][0];
         }
       }
+
       return keypic_captcha_generate($captcha_sid, $form_id);
   }
 }
@@ -76,45 +90,72 @@ function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
 function keypic_captcha_generate($captcha_sid, $form_id = '') {
   module_load_include('php', 'keypic', 'Keypic');
 
-  // Keypic needs agent.
-  $agent[] = 'Drupal/7.x-1.x';
-  $agent[] = 'Keypic PHP5 Class, Version: ' . Keypic::getVersion();
-  $agent = implode(' | ', $agent);
-  Keypic::setUserAgent("User-Agent: {$agent}");
-
   // Keypic needs formID
-  $keypic_form_id = variable_get('keypic_form_id', '');
-  if ($keypic_form_id) {
-    Keypic::setFormID($keypic_form_id);
+  if (!$keypic_form_id = variable_get('keypic_form_id', '')) {
+    return array();
   }
 
-  $result['solution'] = Keypic::getToken('');
-
-  $widget_settings = variable_get('keypic_widget', array());
-  $widget_settings = isset($widget_settings[$form_id]) ? $widget_settings[$form_id] : $widget_settings['default'];
-  
-  $widget_format = $widget_settings['format'];
-  $widget_size = $widget_settings['size'];
-  if ($widget_format === 'image') {
-    $markup = Keypic::getImage($widget_size);
-  }
-  else {
-    $markup = Keypic::getiFrame($widget_size);
+  // No config, do nothing
+  if (!$config = variable_get('keypic_widget', array())) {
+    return array();
   }
 
-  $result['form']['keypic_image'] = array(
-    '#type' => 'markup',
-    '#markup' => $markup,
-    '#weight' => -2,
+  $config = isset($config[$form_id]) ? $config[$form_id] : $config['default'];
+
+  return array(
+    'captcha_validate' => 'keypic_captcha_challenge_validate',
+    'solution' => keypic_get_new_token($keypic_form_id),
+    'form' => array(
+        'keypic_image' => array(
+        '#type' => 'markup',
+        '#weight' => -2,
+        '#markup' => keypic_get_widget($keypic_form_id
+          , $config['format'] === 'image' ? 'getImage' : 'getScript'
+          , $config['size'] ? $config['size'] : '125x125'
+        ),
+    )),
   );
-  $result['captcha_validate'] = 'keypic_captcha_challenge_validate';
-  return $result;
+}
+
+/**
+ * Get Keypic token.
+ *
+ * @param int $form_id Key-pic Form ID.
+ */
+function keypic_get_new_token($form_id) {
+  global $user;
+
+  Keypic::setUserAgent("User-Agent: Drupal/7.x-1.x | Keypic client, Version: " . Keypic::getVersion());
+  Keypic::setFormID($form_id);
+
+  return Keypic::getToken($token = '',
+    $user->uid ? $user->mail : '',
+    $user->uid ? $user->name : '',
+    'Drupal is fetching token…'
+  );
+}
+
+/**
+ * Get form widget.
+ *
+ * @param int $form_id Key-pic Form ID.
+ */
+function keypic_get_widget($form_id, $format = 'getImage', $size = '125x125') {
+  Keypic::setFormID($form_id);
+  return Keypic::getIt($format, $size);
 }
 
 /**
  * Captcha validating callback.
+ *
+ * @param string $solution
+ * @param int $response
+ * @param array $form
+ * @param array $form_state
+ * @return type
+ * @throws Exception
  */
-function keypic_captcha_challenge_validate($solution, $response = '', $form, $form_state) {
+function keypic_captcha_challenge_validate($solution, $response = '', $form = array(), $form_state = array()) {
   switch ($form_state['build_info']['form_id']) {
     case 'contact_personal_form':
     case 'contact_site_form':
@@ -132,6 +173,7 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
       break;
     default:
       $callback = 'keypick_build_params_default';
+      break;
   }
 
   if ($form_state['build_info']['base_form_id']) {
@@ -142,7 +184,9 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
   list($email, $name, $mesasge) = $callback($form, $form_state);
 
   module_load_include('php', 'keypic', 'Keypic');
+  Keypic::setFormID($keypic_form_id = variable_get('keypic_form_id', ''));
   $response = Keypic::isSpam($token, $email, $name, $mesasge);
+
   if (is_numeric($response)) {
     // Check form ID.
     if ($keypic_form_id = variable_get('keypic_form_id', '')) {
@@ -160,6 +204,7 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
 
     return $response < $conf_min;
   }
+
   throw new Exception($response);
 }
 
@@ -167,9 +212,9 @@ function keypic_captcha_challenge_validate($solution, $response = '', $form, $fo
  * Param builder for contact form.
  */
 function keypick_build_params_contact($form, $form_state) {
-  $name = $form_state['value']['name'];
-  $mail = $form_state['value']['mail'];
-  $message = $form_state['value']['message'];
+  $name = $form_state['values']['name'];
+  $mail = $form_state['values']['mail'];
+  $message = $form_state['values']['message'];
   return array($mail, $name, $message);
 }
 
@@ -178,8 +223,8 @@ function keypick_build_params_contact($form, $form_state) {
  */
 function keypick_build_params_user_register($form, $form_state) {
   $email = $form_state['values']['mail'];
-  $name  = $form_state['values']['name'];
-  $msg   = '';
+  $name = $form_state['values']['name'];
+  $msg = '';
   return array($email, $name, $mesasge);
 }
 
@@ -189,7 +234,7 @@ function keypick_build_params_user_register($form, $form_state) {
 function keypick_build_params_user_pass($form, $form_state) {
   $value = $form_state['values']['name'];
   $email = valid_email_address($value) ? $value : '';
-  $name  = empty($email) ? $value : '';
+  $name = empty($email) ? $value : '';
   $mesasge = '';
   return array($email, $name, $mesasge);
 }
@@ -207,7 +252,7 @@ function keypick_build_params_user_login($form, $form_state) {
 function keypick_build_params_comment($form, $form_state) {
   $value = &$form_state['values'];
   $email = !empty($value['mail']) ? $value['mail'] : $GLOBALS['user']->mail;
-  $name  = $value['name'];
+  $name = $value['name'];
   $mesasge = '';
   if (!empty($value['comment_body'])) {
     // Before: $value['comment_body'][LANGUAGE_NONE][0]…
@@ -226,6 +271,7 @@ function keypick_build_params_comment($form, $form_state) {
  */
 function keypick_build_params_default($form, $form_state) {
   global $user;
+
   $email = $user->mail;
   $name = $user->name;
   $mesasge = '';
@@ -234,7 +280,9 @@ function keypick_build_params_default($form, $form_state) {
     $ignore = $ignore || ($key === 'form_build_id');
     $ignore = $ignore || ($key === 'form_id');
     $ignore = $ignore || ($key === 'op');
-    if ($ignore) continue;
+    if ($ignore) {
+      continue;
+    }
 
     if (is_string($val)) {
       $mesasge .= $val . "\n";
@@ -267,12 +315,22 @@ function keypic_load_entities_points($entity_type, $entity_ids = array()) {
  */
 function keypic_get_status_info($point) {
   if ($point < 40) {
-    return t("is not spam");
+    return t('is not spam');
   }
 
-  if ($point < 70) {
-    return t("maybe spam");
+  if ($point < variable_get('keypic_spam_point', 70)) {
+    return t('maybe spam');
   }
 
   return t('is spam');
+}
+
+/**
+ * Implements hook_cron()
+ */
+function keypic_cron() {
+  db_delete('keypic_log')
+    ->condition('timestamp', strtotime('- 3 days'), '<')
+    ->execute()
+  ;
 }
