@@ -58,6 +58,7 @@ function keypic_user_user_insert(&$edit, $account, $category) {
   $record->entity_id = $account->uid;
   $record->point = $keypic_spam_point;
   $record->token = $keypic_spam_token;
+  $record->timestamp = time();
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }

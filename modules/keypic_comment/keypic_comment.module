@@ -96,6 +96,7 @@ function keypic_comment_comment_insert($comment) {
   $record->entity_id = $comment->cid;
   $record->point = $keypic_spam_point;
   $record->token = $keypic_spam_token;
+  $record->timestamp = time();
   if ($keypic_form_id = variable_get('keypic_form_id', '')) {
     $record->form_id = $keypic_form_id;
   }
