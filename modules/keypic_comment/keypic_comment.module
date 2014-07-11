@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic_comment.module
  */
@@ -107,6 +108,22 @@ function keypic_comment_comment_insert($comment) {
     $record->form_id = $keypic_form_id;
   }
   drupal_write_record('keypic_log', $record);
+}
+
+/**
+ * Implements hook_comment_view_alter()
+ */
+function keypic_comment_comment_view_alter(&$build) {
+  if (user_access('report keypic')) {
+    if ($logs = keypic_load_entities_points('comment', array($build['#comment']->cid))) {
+      $log = reset($logs);
+
+      $build['links']['comment']['#links']['keypic_comment_report'] = array(
+        'title' => t('Report spam !number%', array('!number' => $log->point)),
+        'href' => "keypic/report-spam/{$log->form_id}/{$log->token}",
+      );
+    }
+  }
 }
 
 /**
