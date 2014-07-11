@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file keypic.install
  */
@@ -52,12 +53,35 @@ function keypic_schema() {
         'default' => 0,
         'description' => 'Spam Point from KeyPic',
       ),
+      'timestamp' => array(
+        'description' => 'A Unix timestamp indicating when this record was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'indexes' => array(
       'token' => array('token'),
+      'record_created' => array('timestamp'),
     ),
     'primary key' => array('entity_type', 'entity_id'),
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function keypic_update_7001() {
+  // create field
+  db_add_field('keypic_log', 'timestamp', array(
+    'description' => 'A Unix timestamp indicating when this record was created.',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  ));
+
+  // create index
+  db_add_index('keypic_log', 'record_created', array('timestamp'));
 }
