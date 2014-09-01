@@ -3,7 +3,7 @@
 /*  Copyright 2010-2014  Keypic Inc.  (email : info@keypic.com)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as
+    it under the terms of the GNU General Public License, version 2, as 
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -15,15 +15,15 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
+	
 	Works only with PHP >= 5.3.0
 */
 
 class Keypic
 {
 	private static $Instance;
-	private static $version = '1.7';
-	private static $UserAgent = 'User-Agent: Keypic PHP5 Class, Version: 1.7';
+	private static $version = '1.9';
+	private static $UserAgent = 'User-Agent: Keypic PHP5 Class, Version: 1.9';
 	private static $SpamPercentage = 70;
 	private static $host = 'ws.keypic.com';
 	private static $url = '/';
@@ -66,6 +66,8 @@ class Keypic
 	public static function setUserAgent($UserAgent){self::$UserAgent = $UserAgent;}
 
 	public static function setFormID($FormID){self::$FormID = $FormID;}
+
+	public static function getFormID(){return self::$FormID;}
 
 	public static function setPublisherID($PublisherID){self::$PublisherID = $PublisherID;}
 
@@ -118,16 +120,22 @@ class Keypic
 		}
 	}
 
-	public static function getIt($RequestType = 'getScript', $WidthHeight = '125x125', $Debug = null)
+	public static function getIt($RequestType = 'getScript', $WidthHeight = '336x280', $Debug = null)
 	{
-		if($RequestType == 'getImage')
-		{
-			return '<a href="http://' . self::$host . '/?RequestType=getClick&amp;Token=' . self::$Token . '" target="_blank"><img src="//' . self::$host . '/?RequestType=getImage&amp;Token=' . self::$Token . '&amp;WidthHeight=' . $WidthHeight . '&amp;PublisherID=' . self::$PublisherID . '" alt="Form protected by Keypic" /></a>';
-		}
-		else
-		{
-			return '<script type="text/javascript" src="//' . self::$host . '/?RequestType=getScript&amp;Token=' . self::$Token . '&amp;WidthHeight=' . $WidthHeight . '&amp;PublisherID=' . self::$PublisherID . '"></script>';
-		}
+        switch($RequestType)
+        {
+            case 'getImage':
+			    return '<a href="http://' . self::$host . '/?RequestType=getClick&amp;Token=' . self::$Token . '" target="_blank"><img src="//' . self::$host . '/?RequestType=getImage&amp;Token=' . self::$Token . '&amp;WidthHeight=' . $WidthHeight . '&amp;PublisherID=' . self::$PublisherID . '" alt="Form protected by Keypic" /></a>';
+                break;
+
+//            case 'getScript':
+            default:
+			    return '<script type="text/javascript" src="//' . self::$host . '/?RequestType=getScript&amp;Token=' . self::$Token . '&amp;WidthHeight=' . $WidthHeight . '&amp;PublisherID=' . self::$PublisherID . '"></script>';
+                break;
+
+
+            
+        }
 	}
 
 	// Is Spam? from 0% to 100%
@@ -195,12 +203,19 @@ class Keypic
 			$data .="--$boundary\r\n";
 		}
 
+		// and attach the file
+//		$data .= "--$boundary\r\n";
+//		$content_file = join("", file($tmp_name));
+//		$data .="Content-Disposition: form-data; name=\"userfile\"; filename=\"$file_name\"\r\n";
+//		$data .= "Content-Type: $content_type\r\n\r\n";
+//		$data .= "$content_file\r\n";
+//		$data .="--$boundary--\r\n";
+
 		$header .= "Content-length: " . strlen($data) . "\r\n\r\n";
 
 		$socket = new Socket(self::$host, self::$port, $header.$data);
 		$socket->send();
 		$return = explode("\r\n\r\n", $socket->getResponse(), 2);
-
 		return $return[1];
 	}
 }
@@ -255,7 +270,7 @@ class Socket
 			}
 
 			fclose($fs);
-
+			
 		}
 	}
 
