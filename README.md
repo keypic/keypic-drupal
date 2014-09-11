@@ -1,7 +1,7 @@
 keypic-drupal
 ==============
 
-Vanilla Addon to use Keypic Web Service
+Drupal Addon to use Keypic Web Service
 
 Keypic web site
 http://keypic.com
