@@ -3,7 +3,7 @@
 /**
  * @file keypic.module
  *
- * Integrate KeyPic web service to prevent spam content for Drupal sites.
+ * Integrate Keypic web service to prevent spam content for Drupal sites.
  */
 
 /**
@@ -15,7 +15,7 @@ function keypic_permission() {
       'title' => t('Report spam'),
     ),
     'administer keypic' => array(
-      'title' => t('KeyPic Administration'),
+      'title' => t('Keypic Administration'),
     ),
   );
 }
@@ -25,7 +25,7 @@ function keypic_permission() {
  */
 function keypic_menu() {
   $items['keypic/report-spam/%/%'] = array(
-    'title' => 'Report spam to KeyPic',
+    'title' => 'Report spam to Keypic',
     'access callback' => 'keypic_access_report',
     'file' => 'keypic.pages.inc',
     'page callback' => 'keypic_report_spam_page_callback',
@@ -33,8 +33,8 @@ function keypic_menu() {
   );
 
   $items['admin/config/people/captcha/keypic'] = array(
-    'title' => 'KeyPic',
-    'description' => 'Administer the KeyPic web service.',
+    'title' => 'Keypic',
+    'description' => 'Administer the Keypic Web Service.',
     'access arguments' => array('administer keypic'),
     'file' => 'keypic.admin.inc',
     'page callback' => 'drupal_get_form',
@@ -43,7 +43,7 @@ function keypic_menu() {
   );
 
   $items['admin/config/people/captcha/keypic/%'] = array(
-    'title' => 'KeyPic',
+    'title' => 'Keypic',
     'access arguments' => array('administer keypic'),
     'file' => 'keypic.admin.inc',
     'page callback' => 'drupal_get_form',
@@ -69,7 +69,7 @@ function keypic_access_report() {
 function keypic_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
   switch ($op) {
     case 'list':
-      return array('KeyPic');
+      return array('Keypic');
 
     case 'generate':
       // Keypic need form ID to display configured widget.

@@ -1,5 +1,5 @@
 name = Keypic
-description = KeyPic captcha challenge
+description = Keypic captcha challenge
 package = Spam control
 core = 7.x
 dependencies[] = captcha

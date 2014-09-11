@@ -1,6 +1,6 @@
-name = KeyPic User
+name = Keypic User
 version = 7.x-1.0-dev
-description = Integrate KeyPic to Drupal User.
+description = Integrate Keypic to Drupal User.
 
 package = Spam control
 

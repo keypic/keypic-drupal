@@ -23,7 +23,7 @@ function keypic_comment_form_alter(&$form, $form_state, $form_id) {
 
   $form['captcha'] = array(
     '#type' => 'captcha',
-    '#captcha_type' => 'keypic/KeyPic',
+    '#captcha_type' => 'keypic/Keypic',
     '#weight' => 100,
   );
 }
@@ -58,7 +58,7 @@ function keypic_comment_form_comment_admin_overview_alter(&$form, $form_state) {
   }
 
   if (!empty($alter)) {
-    $form['comments']['#header']['keypic']['data'] = t('KeyPic');
+    $form['comments']['#header']['keypic']['data'] = t('Keypic');
   }
 }
 

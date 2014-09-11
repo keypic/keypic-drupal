@@ -1,6 +1,6 @@
-name = KeyPic Comment
+name = Keypic Comment
 version = 7.x-1.0-dev
-description = Integrate KeyPic to Drupal comment.
+description = Integrate Keypic to Drupal comment.
 
 package = Spam control
 

@@ -17,7 +17,7 @@ function keypic_user_form_user_register_form_alter(&$form, $form_state) {
 
   $form['captcha'] = array(
     '#type' => 'captcha',
-    '#captcha_type' => 'keypic/KeyPic',
+    '#captcha_type' => 'keypic/Keypic',
     '#weight' => 100,
   );
 }
@@ -103,6 +103,6 @@ function keypic_user_form_user_admin_account_alter(&$form, $form_state) {
   }
 
   if (!empty($alter)) {
-    $form['accounts']['#header']['keypic']['data'] = t('KeyPic');
+    $form['accounts']['#header']['keypic']['data'] = t('Keypic');
   }
 }

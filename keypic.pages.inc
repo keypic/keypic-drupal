@@ -3,11 +3,11 @@
 /**
  * @file keypic.pages.inc
  *
- * Functions for KeyPic pages
+ * Functions for Keypic pages
  */
 
 /**
- *  Page callback for KeyPic spam reporting page.
+ *  Page callback for Keypic spam reporting page.
  */
 function keypic_report_spam_page_callback($form_id, $token) {
   $select = db_select('keypic_log', 'kpc');
